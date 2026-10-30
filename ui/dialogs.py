@@ -5,7 +5,6 @@ import ipaddress
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QCheckBox,
-    QComboBox,
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
@@ -181,76 +180,20 @@ class SettingsDialog(QDialog):
         root.addWidget(energy_group)
 
         app_group = QGroupBox("Application")
-        app_layout = QVBoxLayout(app_group)
-
-        app_help = QLabel(
-            "Définis le comportement de PlugPilot au démarrage et "
-            "lorsque tu fermes sa fenêtre."
-        )
-        app_help.setObjectName("muted")
-        app_help.setWordWrap(True)
-        app_layout.addWidget(app_help)
-
-        app_form = QFormLayout()
-
+        app_form = QFormLayout(app_group)
         self.refresh_interval = QSpinBox()
         self.refresh_interval.setRange(5, 60)
         self.refresh_interval.setSuffix(" secondes")
         self.refresh_interval.setValue(config.refresh_interval_seconds)
         app_form.addRow("Actualisation", self.refresh_interval)
 
-        self.close_action = QComboBox()
-        self.close_action.addItem(
-            "Continuer près de l’horloge",
-            "tray",
+        self.close_to_tray = QCheckBox(
+            "Continuer à fonctionner près de l’horloge après fermeture"
         )
-        self.close_action.addItem(
-            "Quitter complètement",
-            "quit",
-        )
-        self.close_action.addItem(
-            "Me demander à chaque fois",
-            "ask",
-        )
-        close_index = self.close_action.findData(config.close_action)
-        self.close_action.setCurrentIndex(max(0, close_index))
-        app_form.addRow(
-            "À la fermeture",
-            self.close_action,
-        )
-
-        self.tray_notification = QComboBox()
-        self.tray_notification.addItem(
-            "Toujours afficher le message",
-            "always",
-        )
-        self.tray_notification.addItem(
-            "Une seule fois par session",
-            "once",
-        )
-        self.tray_notification.addItem(
-            "Ne jamais afficher le message",
-            "never",
-        )
-        notification_index = self.tray_notification.findData(
-            config.tray_notification
-        )
-        self.tray_notification.setCurrentIndex(
-            max(0, notification_index)
-        )
-        app_form.addRow(
-            "Message de confirmation",
-            self.tray_notification,
-        )
-
-        app_layout.addLayout(app_form)
-
-        self.start_minimized = QCheckBox(
-            "Démarrer directement près de l’horloge"
-        )
-        self.start_minimized.setChecked(config.start_minimized)
-        app_layout.addWidget(self.start_minimized)
-
+        self.close_to_tray.setChecked(config.close_action == "tray")
+        self._tray_notification = config.tray_notification
+        self._start_minimized = config.start_minimized
+        app_form.addRow("", self.close_to_tray)
         root.addWidget(app_group)
 
         buttons = QDialogButtonBox(
@@ -265,9 +208,9 @@ class SettingsDialog(QDialog):
     def values(self) -> dict:
         return {
             "kwh_price": self.kwh_price.value(),
-            "close_action": self.close_action.currentData(),
-            "tray_notification": self.tray_notification.currentData(),
-            "start_minimized": self.start_minimized.isChecked(),
+            "close_action": "tray" if self.close_to_tray.isChecked() else "quit",
+            "tray_notification": self._tray_notification,
+            "start_minimized": self._start_minimized,
             "refresh_interval_seconds": self.refresh_interval.value(),
         }
 

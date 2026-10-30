@@ -163,6 +163,10 @@ class PlugCard(QFrame):
         root.setContentsMargins(18, 15, 16, 15)
         root.setSpacing(14)
 
+        self.indicator = QLabel()
+        self.indicator.setFixedSize(11, 11)
+        root.addWidget(self.indicator, 0, Qt.AlignTop)
+
         content = QVBoxLayout()
         content.setSpacing(10)
 
@@ -233,25 +237,35 @@ class PlugCard(QFrame):
         self.plug = plug
         self.title.setText(plug.alias)
         self.badge.setText(plug.model)
+
         colors = palette(self.dark_mode)
 
         if plug.connecting:
-            state_color = colors["accent"]
+            color = colors["accent"]
             self.power.set_value("Connexion…")
             self.energy.set_value("Connexion…")
-            self.status_text.setText("●  Connexion…")
+            self.status_text.setText("Connexion…")
+            self.status_text.setStyleSheet(f"color: {color};")
             self.switch.setEnabled(False)
             self.switch.setChecked(False)
         elif not plug.online:
-            state_color = colors["muted"]
+            color = colors["muted"]
             self.power.set_value("—")
             self.energy.set_value("—")
-            self.status_text.setText("●  Hors ligne")
+            self.status_text.setText("Hors ligne")
+            self.status_text.setStyleSheet(
+                f"color: {colors['muted']};"
+            )
             self.switch.setEnabled(False)
             self.switch.setChecked(False)
         else:
-            state_color = colors["success"] if plug.is_on else colors["danger"]
+            color = (
+                colors["success"]
+                if plug.is_on
+                else colors["danger"]
+            )
             state_text = "Allumée" if plug.is_on else "Éteinte"
+
             self.power.set_value(
                 f"{plug.power_w:.1f} W"
                 if plug.power_w is not None
@@ -262,21 +276,13 @@ class PlugCard(QFrame):
                 if plug.energy_today_kwh is not None
                 else "Non disponible"
             )
-            self.status_text.setText(f"●  {state_text}")
+            self.status_text.setText(state_text)
+            self.status_text.setStyleSheet(f"color: {color};")
             self.switch.setEnabled(True)
             self.switch.setChecked(plug.is_on)
 
-        self.status_text.setStyleSheet(
-            f"color: {state_color}; font-weight: 650;"
-        )
-        self.setStyleSheet(
-            f"""
-            QFrame#plugCard {{
-                background: {colors['surface']};
-                border: 1px solid {state_color};
-                border-radius: 16px;
-            }}
-            """
+        self.indicator.setStyleSheet(
+            f"background:{color}; border-radius:6px;"
         )
 
     def set_dark_mode(self, dark_mode: bool) -> None:
