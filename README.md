@@ -1,4 +1,4 @@
-# PlugPilot 1.0 — version finale
+# PlugPilot pour Windows
 
 PlugPilot est une application Windows locale pour piloter des prises
 TP-Link Kasa et Tapo.
@@ -61,3 +61,10 @@ puis relance la recherche dans PlugPilot.
 La configuration et le journal d'erreurs sont enregistrés dans :
 
 `C:\Users\<utilisateur>\.tapo_pc_control`
+
+## Développement et mises à jour
+
+Les sources et les installateurs stables sont regroupés dans ce dépôt.
+Lancer `lancer_dev.bat` pour tester les sources. Les mises à jour de l’application
+installée sont disponibles via **Réglages → Mises à jour** après publication
+d’un installateur stable. Voir [MISES_A_JOUR.md](MISES_A_JOUR.md).

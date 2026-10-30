@@ -16,3 +16,10 @@ update/
 config.json
 .vscode/
 .idea/
+
+# Secrets et certificats locaux
+*.pem
+*.key
+*.pfx
+*.p12
+secrets.json

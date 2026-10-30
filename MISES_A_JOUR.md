@@ -18,8 +18,7 @@ ce système.
 
 ## Distribution
 
-- Sources privées : https://github.com/ImprimER/Plug-Pilot
-- Installateurs publics : https://github.com/ImprimER/PlugPilot-Releases
+- Sources et installateurs publics : https://github.com/ImprimER/Plug-Pilot
 - Aucun identifiant GitHub n'est embarqué ni demandé aux utilisateurs.
 - Les brouillons et préversions ne sont pas proposés.
 - Sans version publiée, la fenêtre signale qu'aucune version stable n'est disponible.
@@ -33,7 +32,7 @@ ce système.
    Le script refuse les versions .dev0 et reconstruit systématiquement l'exe.
    Il produit installer/PlugPilot-Setup-1.1.0.exe et son fichier .exe.sha256.
 4. Tester l'installation et la mise à niveau depuis la version précédente.
-5. Enregistrer le code dans le dépôt privé. Dans le dépôt PUBLIC PlugPilot-Releases,
+5. Enregistrer le code dans le dépôt Plug-Pilot. Dans ce même dépôt public,
    créer une Release avec le tag exact v1.1.0, les changements et les deux fichiers.
    Vérifier que GitHub indique une empreinte SHA-256 pour l'asset exe avant publication.
    Seuls l'installateur construit, son empreinte et les notes doivent être publiés,
