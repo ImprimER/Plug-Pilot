@@ -1,0 +1,25 @@
+PLUGPILOT — DOSSIER DE DEVELOPPEMENT PROPRE
+
+UTILISATION NORMALE
+- Double-clique sur lancer_dev.bat.
+- Le premier lancement installe les dependances.
+- Les suivants sont directs.
+- Aucun EXE a reconstruire pendant le developpement.
+
+MISE A JOUR
+1. Place le fichier fourni "mise_a_jour.zip" dans ce dossier.
+2. Double-clique sur mettre_a_jour.bat.
+3. Lance PlugPilot avec lancer_dev.bat.
+
+Le patch contient sa propre arborescence et une liste de fichiers.
+Le script refuse les patchs incomplets et sauvegarde les anciens fichiers.
+
+EN CAS DE PROBLEME
+- Lance restaurer_sauvegarde.bat.
+
+DIAGNOSTIC
+- Lance lancer_console.bat pour voir les erreurs.
+
+VERSION FINALE
+- Ne lance construire_exe.bat qu'une fois la version validee.
+- Puis construis l'installateur.
