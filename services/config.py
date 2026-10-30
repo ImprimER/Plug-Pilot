@@ -37,17 +37,21 @@ class ConfigService:
 
     def load(self) -> AppConfig:
         data = asdict(AppConfig.default())
+        has_current_config = False
 
         try:
             current = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
             if isinstance(current, dict):
                 data.update(current)
+                has_current_config = True
         except Exception:
             pass
 
-        # Migration des anciennes versions.
+        # Importer l'ancien fichier uniquement en l'absence de configuration
+        # actuelle, sinon une adresse oubliée serait réimportée à chaque démarrage.
         try:
-            legacy = json.loads(LEGACY_CONFIG_FILE.read_text(encoding="utf-8"))
+            legacy = (json.loads(LEGACY_CONFIG_FILE.read_text(encoding="utf-8"))
+                      if not has_current_config else {})
             old_ips = legacy.get("manual_ips", [])
             data["manual_ips"] = list(
                 dict.fromkeys(list(data.get("manual_ips", [])) + list(old_ips))
