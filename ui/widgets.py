@@ -141,6 +141,24 @@ class StatBlock(QWidget):
             self.value.setText(value)
 
 
+class StatusDot(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(12, 12)
+        self._color = QColor("#96a0ab")
+
+    def set_color(self, color: str) -> None:
+        self._color = QColor(color)
+        self.update()
+
+    def paintEvent(self, _event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(self._color)
+        painter.drawEllipse(1, 1, 10, 10)
+
+
 class PlugCard(QFrame):
     toggle_requested = Signal(str, bool)
     rename_requested = Signal(str)
@@ -163,8 +181,7 @@ class PlugCard(QFrame):
         root.setContentsMargins(18, 15, 16, 15)
         root.setSpacing(14)
 
-        self.indicator = QLabel()
-        self.indicator.setFixedSize(11, 11)
+        self.indicator = StatusDot()
         root.addWidget(self.indicator, 0, Qt.AlignTop)
 
         content = QVBoxLayout()
@@ -281,9 +298,7 @@ class PlugCard(QFrame):
             self.switch.setEnabled(True)
             self.switch.setChecked(plug.is_on)
 
-        self.indicator.setStyleSheet(
-            f"background:{color}; border-radius:6px;"
-        )
+        self.indicator.set_color(color)
 
     def set_dark_mode(self, dark_mode: bool) -> None:
         self.dark_mode = dark_mode
