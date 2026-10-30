@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
         self.plugs: dict[str, PlugView] = {}
         self.cards: dict[str, PlugCard] = {}
 
+        self.startup_pending = set()
         self.refresh_running = False
         self.discovery_running = False
         self.user_action_running = False
@@ -269,7 +270,7 @@ class MainWindow(QMainWindow):
             self.tray.rebuild(force=True)
 
     def connect_known_devices(self) -> None:
-        if self.refresh_running:
+        if self.startup_pending or self.refresh_running or self.discovery_running:
             return
 
         credentials = load_credentials() or self.request_credentials()
@@ -283,14 +284,44 @@ class MainWindow(QMainWindow):
             self.discover_devices()
             return
 
-        self.refresh_running = True
+        hosts = list(dict.fromkeys(
+            [item["host"] for item in self.config.known_devices if item.get("host")]
+            + self.config.manual_ips
+        ))
+        self.startup_pending = set(hosts)
         self.status.setText("Connexion aux prises mémorisées…")
+        for host in hosts:
+            self.worker.submit(
+                self.manager.connect_one(host, credentials),
+                self.startup_device_connected,
+                lambda error, host=host: self.startup_device_failed(host, error),
+            )
 
-        self.worker.submit(
-            self.manager.connect_known(credentials),
-            self.known_devices_connected,
-            self.operation_failed_silent,
+    def startup_device_failed(self, host: str, error: Exception) -> None:
+        plug = self.plugs.get(host)
+        if plug is not None:
+            plug.connecting = False
+            plug.online = False
+            self.startup_device_connected(plug)
+        else:
+            self.startup_pending.discard(host)
+
+    def startup_device_connected(self, plug: PlugView) -> None:
+        self.startup_pending.discard(plug.host)
+        self.plugs[plug.host] = plug
+        self.devices = dict(self.manager.devices)
+        self.config_service.remember_devices(self.config, [plug])
+        self.rebuild_card_list()
+        self.tray.rebuild()
+        online = sum(item.online for item in self.plugs.values())
+        pending = len(self.startup_pending)
+        self.status.setText(
+            f"{online} prise(s) connectée(s) · {pending} connexion(s) en cours"
+            if pending else f"{online} prise(s) connectée(s)"
         )
+        if not pending:
+            self.refresh_timer.start()
+            QTimer.singleShot(3000, self.discover_devices_silently)
 
     def known_devices_connected(
         self,
@@ -383,7 +414,7 @@ class MainWindow(QMainWindow):
         )
 
     def discover_devices(self) -> None:
-        if self.discovery_running:
+        if self.startup_pending or self.discovery_running:
             return
 
         credentials = load_credentials() or self.request_credentials()
@@ -437,7 +468,7 @@ class MainWindow(QMainWindow):
         self.tray.rebuild()
 
     def refresh_known_devices(self) -> None:
-        if self.refresh_running:
+        if self.startup_pending or self.refresh_running:
             return
 
         self.refresh_running = True

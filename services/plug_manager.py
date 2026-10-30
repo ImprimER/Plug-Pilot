@@ -59,6 +59,29 @@ class PlugManager:
         self.plugs = {plug.host: plug for plug in views}
         return views
 
+    async def connect_one(self, host: str, credentials: Credentials) -> PlugView:
+        metadata = next(
+            (item for item in self.config.known_devices if item.get("host") == host),
+            {"host": host, "alias": host, "model": "Prise TP-Link"},
+        )
+        try:
+            plug = await asyncio.wait_for(
+                self.client.connect_from_cache(host, credentials, metadata),
+                timeout=12.0,
+            )
+        except Exception:
+            plug = PlugView(
+                host=host, alias=str(metadata.get("alias") or host),
+                model=str(metadata.get("model") or "Prise TP-Link"),
+                is_on=False, power_w=None, energy_today_kwh=None,
+                online=False, device=None, connecting=False,
+            )
+        self.config_service.apply_custom_aliases(self.config, [plug])
+        self.plugs[host] = plug
+        if plug.online and plug.device is not None:
+            self.devices[host] = plug.device
+        return plug
+
     async def connect_known(
         self,
         credentials: Credentials,

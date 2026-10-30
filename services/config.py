@@ -150,6 +150,9 @@ class ConfigService:
                 "model": plug.model,
             }
 
+            cached = remembered.get(plug.host, {}).get("connection_config")
+            if isinstance(cached, dict):
+                item["connection_config"] = cached
             try:
                 if plug.device is not None:
                     connection_config = plug.device.config.to_dict()
