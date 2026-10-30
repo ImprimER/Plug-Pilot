@@ -1,5 +1,6 @@
 """Build a fresh Windows installer. Does not publish or install it."""
 from pathlib import Path
+import hashlib
 import os
 import re
 import subprocess
@@ -32,7 +33,13 @@ def main() -> int:
          f"/FPlugPilot-Setup-{APP_VERSION}", "PlugPilot.iss"],
         cwd=root, check=True,
     )
-    print(f"Installateur prêt : {root / 'installer' / f'PlugPilot-Setup-{APP_VERSION}.exe'}")
+    installer = root / 'installer' / f'PlugPilot-Setup-{APP_VERSION}.exe'
+    with installer.open('rb') as stream:
+        checksum = hashlib.file_digest(stream, 'sha256').hexdigest()
+    installer.with_suffix('.exe.sha256').write_text(
+        f"{checksum}  {installer.name}\n", encoding='utf-8',
+    )
+    print(f"Installateur prêt : {installer}")
     return 0
 
 

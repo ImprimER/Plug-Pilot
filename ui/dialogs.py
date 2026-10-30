@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import ipaddress
 
-from PySide6.QtCore import Signal, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -21,7 +20,8 @@ from PySide6.QtWidgets import (
 )
 
 from services.config import AppConfig
-from services.version import APP_VERSION, RELEASES_URL
+from services.version import APP_VERSION
+from ui.updates import UpdateDialog
 
 
 class AddDeviceDialog(QDialog):
@@ -219,27 +219,7 @@ class SettingsDialog(QDialog):
         root.addWidget(buttons)
 
     def open_updates(self) -> None:
-        from PySide6.QtWidgets import QMessageBox
-
-        dialog = QMessageBox(self)
-        dialog.setWindowTitle("Mises à jour de PlugPilot")
-        dialog.setText(f"Version actuelle : {APP_VERSION}")
-        dialog.setInformativeText(
-            "Consulte les versions stables sur GitHub, puis télécharge "
-            "l’installateur de la version souhaitée.\n\n"
-            "Connecte-toi à ton compte GitHub si nécessaire. "
-            "Quitte complètement PlugPilot avant de lancer l’installateur. "
-            "Tes prises et réglages sont conservés."
-        )
-        open_button = dialog.addButton("Voir les versions", QMessageBox.AcceptRole)
-        dialog.addButton("Fermer", QMessageBox.RejectRole)
-        dialog.exec()
-        if dialog.clickedButton() is open_button:
-            if not QDesktopServices.openUrl(QUrl(RELEASES_URL)):
-                QMessageBox.warning(
-                    self, "Navigateur indisponible",
-                    f"Ouvre cette adresse dans ton navigateur :\n{RELEASES_URL}",
-                )
+        UpdateDialog(self).exec()
 
     def values(self) -> dict:
         return {

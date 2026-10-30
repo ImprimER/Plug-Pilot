@@ -141,6 +141,7 @@ def apply_theme(app: QApplication, dark_mode: bool) -> None:
         }}
 
         QLineEdit,
+        QTextEdit,
         QDoubleSpinBox,
         QSpinBox {{
             background: {c["surface"]};
