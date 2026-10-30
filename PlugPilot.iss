@@ -1,5 +1,7 @@
 #define MyAppName "PlugPilot"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion Trim(FileRead(FileOpen("VERSION.txt")))
+#endif
 #define MyAppPublisher "PlugPilot"
 #define MyAppExeName "PlugPilot.exe"
 

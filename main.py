@@ -10,6 +10,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from services.config import APP_DIR, LOG_FILE
+from services.version import APP_VERSION
 from ui.dashboard import MainWindow
 from ui.themes import apply_theme
 
@@ -45,6 +46,7 @@ def install_exception_handler() -> None:
 def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("PlugPilot")
+    app.setApplicationVersion(APP_VERSION)
     app.setOrganizationName("PlugPilot")
     app.setQuitOnLastWindowClosed(False)
 
