@@ -25,6 +25,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
 RestartApplications=no
+UsePreviousTasks=yes
 
 [Languages]
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
@@ -43,3 +44,4 @@ Name: "{userstartup}\PlugPilot"; Filename: "{app}\PlugPilot.exe"; Tasks: startup
 
 [Run]
 Filename: "{app}\PlugPilot.exe"; Description: "Lancer PlugPilot"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\PlugPilot.exe"; Flags: nowait runasoriginaluser; Check: WizardSilent

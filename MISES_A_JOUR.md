@@ -3,11 +3,11 @@
 ## Dans l'application
 
 Réglages → Mises à jour recherche la dernière version stable publiée.
-Si une version plus récente existe, PlugPilot affiche ses changements et propose
+Si une version plus récente existe, PlugPilot propose un lien vers les notes de version et le bouton
 **Mettre à jour**. Le téléchargement se déroule en arrière-plan avec une barre
 de progression et peut être annulé. La taille et l'empreinte SHA-256 fournies par
-GitHub sont vérifiées avant de proposer **Installer et fermer PlugPilot**.
-L'assistant Inno Setup s'ouvre ensuite ; l'utilisateur termine l'installation.
+GitHub sont vérifiées avant de proposer **Installer et redémarrer**.
+La mise à jour s’installe sans les pages de l’assistant, avec une fenêtre de progression, puis PlugPilot redémarre. Les choix de raccourcis et de démarrage existants sont conservés. La première installation reste interactive.
 Les réglages et identifiants restent dans le profil utilisateur et le gestionnaire Windows.
 
 La recherche est déclenchée à la demande. Rien n'est installé automatiquement.
@@ -44,3 +44,5 @@ Ne pas modifier AppId ni le mode d'installation de PlugPilot.iss entre deux vers
 L'empreinte contrôle l'intégrité du fichier téléchargé ; elle ne remplace pas une
 signature Authenticode. Windows peut encore afficher un avertissement pour un
 installateur non signé.
+
+La version 1.1.2 apporte le lancement simplifié. La mise à niveau depuis une version antérieure peut donc encore afficher l’ancien assistant une dernière fois. Les mises à jour lancées depuis 1.1.2 utiliseront le parcours simplifié.

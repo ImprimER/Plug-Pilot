@@ -16,7 +16,7 @@ LOG_FILE = APP_DIR / "plugpilot.log"
 class AppConfig:
     manual_ips: list[str] = field(default_factory=list)
     close_action: str = "tray"
-    tray_notification: str = "once"
+    tray_notification: str = "never"
     start_minimized: bool = False
     dark_mode: bool = True
     kwh_price: float = 0.2516

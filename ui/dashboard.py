@@ -15,7 +15,6 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
-    QSystemTrayIcon,
     QVBoxLayout,
     QWidget,
 )
@@ -52,7 +51,6 @@ class MainWindow(QMainWindow):
         self.refresh_running = False
         self.discovery_running = False
         self.user_action_running = False
-        self._tray_hint_shown = False
 
         self.setWindowTitle("PlugPilot")
         self.resize(
@@ -805,27 +803,9 @@ class MainWindow(QMainWindow):
         if action == "tray":
             event.ignore()
             self.hide()
-            self._show_tray_notification_if_needed()
             return
 
         event.accept()
-
-    def _show_tray_notification_if_needed(self) -> None:
-        mode = self.config.tray_notification
-
-        if mode == "never":
-            return
-
-        if mode == "once" and self._tray_hint_shown:
-            return
-
-        self._tray_hint_shown = True
-        self.tray.tray.showMessage(
-            "PlugPilot",
-            "PlugPilot continue de fonctionner près de l’horloge.",
-            QSystemTrayIcon.MessageIcon.Information,
-            2200,
-        )
 
     def shutdown(self) -> None:
         self.refresh_timer.stop()

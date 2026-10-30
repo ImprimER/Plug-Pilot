@@ -3,14 +3,15 @@ import subprocess
 import sys
 import threading
 
-from PySide6.QtCore import QObject, Signal, Slot, Qt
+from PySide6.QtCore import QObject, Signal, Slot, Qt, QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QApplication, QDialog, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
-    QPushButton, QTextEdit, QVBoxLayout,
+    QPushButton, QVBoxLayout,
 )
 
 from services.updater import check_for_update, download_update, Update, UpdateError
-from services.version import APP_VERSION
+from services.version import APP_VERSION, RELEASES_URL
 
 
 class UpdateJob(QObject):
@@ -72,10 +73,9 @@ class UpdateDialog(QDialog):
         self.status = QLabel("Recherche d’une nouvelle version…")
         self.status.setWordWrap(True)
         root.addWidget(self.status)
-        self.notes = QTextEdit()
-        self.notes.setReadOnly(True)
-        self.notes.setMinimumHeight(130)
-        self.notes.setMaximumHeight(220)
+        self.notes = QPushButton("Voir les notes de version")
+        self.notes.setObjectName("secondary")
+        self.notes.clicked.connect(self.open_release_notes)
         self.notes.hide()
         root.addWidget(self.notes)
         self.progress = QProgressBar()
@@ -123,14 +123,13 @@ class UpdateDialog(QDialog):
         if isinstance(result, Update):
             self.update = result
             self.status.setText(f"La version {result.version} est disponible.")
-            self.notes.setPlainText(result.notes)
             self.notes.show()
             self.action.setText("Mettre à jour")
             self.action.show()
         elif isinstance(result, Path):
             self.installer = result
-            self.status.setText("Téléchargement vérifié. PlugPilot va se fermer pour permettre l’installation.")
-            self.action.setText("Installer et fermer PlugPilot" if getattr(sys, "frozen", False)
+            self.status.setText("La mise à jour est prête. PlugPilot se fermera puis redémarrera après l’installation.")
+            self.action.setText("Installer et redémarrer" if getattr(sys, "frozen", False)
                                 else "Afficher l’installateur téléchargé")
             self.action.show()
         else:
@@ -154,7 +153,7 @@ class UpdateDialog(QDialog):
                     "de l’application installée.\n\nInstallateur :\n" + str(self.installer))
                 return
             try:
-                subprocess.Popen([str(self.installer), "/NORESTART", "/CLOSEAPPLICATIONS"],
+                subprocess.Popen([str(self.installer), "/SILENT", "/NORESTART", "/CLOSEAPPLICATIONS"],
                                  cwd=str(self.installer.parent))
             except OSError:
                 self.status.setText("Impossible de lancer l’installateur. Réessaie.")
@@ -168,6 +167,11 @@ class UpdateDialog(QDialog):
             self.start_job(UpdateJob(self.update, self))
         else:
             self.start_check()
+
+    def open_release_notes(self):
+        if self.update and not QDesktopServices.openUrl(
+                QUrl(f"{RELEASES_URL}/tag/v{self.update.version}")):
+            QMessageBox.warning(self, "Notes de version", "Impossible d’ouvrir le navigateur.")
 
     def reject(self):
         if self.job and self.job.isRunning():
